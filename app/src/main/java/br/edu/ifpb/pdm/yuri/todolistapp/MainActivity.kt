@@ -3,7 +3,10 @@ package br.edu.ifpb.pdm.yuri.todolistapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -14,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import br.edu.ifpb.pdm.yuri.todolistapp.ui.theme.TodoListAppTheme
-import androidx.compose.foundation.border
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +60,7 @@ fun TaskApp() {
                     modifier = Modifier.fillMaxWidth(),
                     text = "${taskList.size} tarefas",
                     style = MaterialTheme.typography.bodyLarge,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -84,28 +87,49 @@ fun TaskApp() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lista de tarefas
-            Column(
+            // Lista de tarefas em Cards
+            LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                taskList.forEach { task ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(task)
-
-                        IconButton(onClick = {
-                            taskList = taskList - task
-                        }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Remover tarefa")
-                        }
-                    }
+                items(taskList) { task ->
+                    TaskCard(task = task, onDelete = {
+                        taskList = taskList - task
+                    })
                 }
             }
         }
+    }
+}
+
+@Composable
+fun TaskCard(task: String, onDelete: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = task, style = MaterialTheme.typography.bodyLarge)
+
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Delete, contentDescription = "Remover tarefa")
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewTaskApp() {
+    TodoListAppTheme {
+        TaskApp()
     }
 }
